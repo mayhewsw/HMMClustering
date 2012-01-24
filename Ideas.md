@@ -5,6 +5,7 @@ researching which are the best known and most used approaches for clustering
 using HMMs.
 
 Here are a few ideas:
+
 * Put all relations into one big cluster
 * Train a single HMM using every relation as training data (probably 
 use Baum-Welch algorithm?)

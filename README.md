@@ -9,17 +9,17 @@ system will use HMMs to group (or cluster) these relations together by meaning.
 
 For example, a file with relations might look like the following:
 
-`Abe Lincoln	      became	   president
-Facebook	      is	   a waste of time
-Lincoln	      was	   a president
-Abraham Lincoln      was elected  president
-Facebook	      is clearly   a huge time-waster`
+    Abe Lincoln	      became	   president
+    Facebook	      is	   a waste of time
+    Lincoln	      was	   a president
+    Abraham Lincoln      was elected  president
+    Facebook	      is clearly   a huge time-waster
 
 The output of our system might look like:
 
-`Abe Lincoln	      became	   president`
-`Lincoln	      was	   a president`
-`Abraham Lincoln      was elected  president`
+    Abe Lincoln	      became	   president
+    Lincoln	      was	   a president
+    Abraham Lincoln      was elected  president
 
-`Facebook	      is	   a waste of time`
-`Facebook	      is clearly   a huge time-waster`
+    Facebook	      is	   a waste of time
+    Facebook	      is clearly   a huge time-waster

@@ -52,6 +52,7 @@ public class ClusterTesting {
 		a.addString(this.s4);
 		a.addString(this.s5);
 		
+		
 		b.addString(this.s2);
 		b.addString(this.s3);
 		b.addString(this.s4);
@@ -96,7 +97,7 @@ public class ClusterTesting {
 		
 	}
 	
-	@Test
+	//@Test
 	public void testPR(){
 		try {
 			this.goldClusters = this.ot.readInClustering(OutputTesting.clusterdir + "clusters.txt");

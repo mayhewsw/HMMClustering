@@ -17,8 +17,8 @@ public class Ngram implements Algorithm {
 	public static String workdir = 
 			"/home/stephen/Documents/Classes/Fall2011/NLP/resolver-export/MyReverbData/";
 	
-	public static String infile = workdir + "randomized_clusters5.txt";
-	public static String outfile = workdir + "clustered_clusters5.txt";
+	public static String infile = workdir + "randomized_clusters6.txt";
+	public static String outfile = workdir + "clustered_clusters6.txt";
 	
 	
 	ArrayList<String[]> lines;
@@ -47,24 +47,26 @@ public class Ngram implements Algorithm {
 			
 			c.addStringNoConvert(GeneralUtility.join(lines.get(i), " :::: ", 0, lines.get(i).length-1));
 
+			// Create the ngram model for the i string
+			String istring = GeneralUtility.join(lines.get(i), " ", 0, 2);
+			// Start with higher N in ngrams
+			
+			
+			
 			for (int j = i + 1; j < lines.size(); j++) {
 				if (ignoreUs.contains(j)) {
 					continue;
 				}
+				
+				// compare j against the ngram model for i
+				String jstring = GeneralUtility.join(lines.get(j), " ", 0, 2);
+				
+				// If j is withing the correct boundary??? cluster it.
+				
+				// If j is clustered.
+				ignoreUs.add(j);
+				// update ngram model with new data from j string
 
-				// Get distance. If distance is within a certain threshold, then
-				// add to cluster, add j to ignore list, otherwise ignore.
-				String iString = lines.get(i)[whichFeature];
-				String jString = lines.get(j)[whichFeature];
-				int dist = LevenshteinDistance(iString, jString);
-
-				int averageLength = (int) ((iString.length() + jString.length()) / 2.00);
-				if (dist < averageLength/2) {
-					//c.addStringNoConvert(lines.get(j)[whichElement] + " :::: "
-							//+ lines.get(j)[3]);
-					c.addStringNoConvert(GeneralUtility.join(lines.get(j), " :::: ", 0, lines.get(j).length-1));
-					ignoreUs.add(j);
-				}
 			}
 			ret.add(c);
 		}
@@ -201,9 +203,9 @@ public class Ngram implements Algorithm {
 
 
 	public static void main(String[] args) {
-		NGram s = new NGram();
-//		s.getData(infile);
-//		HashSet<Cluster> clusters = s.divideToClusters();
+		Ngram s = new Ngram();
+		s.getData(infile);
+		HashSet<Cluster> clusters = s.divideToClusters(0);
 //		s.produceOutput(clusters, outfile);
 //		System.out.println("Done");
 //		

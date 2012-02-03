@@ -83,7 +83,9 @@ public class SimpleSSM implements Algorithm {
 		clusters.open();
 
 		String[] line = clusters.readLine();
-
+		System.out.println(line[0]);
+		
+		
 		while (line != null) {
 			lines.add(line);
 			line = clusters.readLine();

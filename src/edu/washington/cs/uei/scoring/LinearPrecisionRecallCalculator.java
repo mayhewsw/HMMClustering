@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import edu.washington.cs.uei.disktable.BasicDiskTable;
+import edu.washington.cs.uei.util.GeneralUtility;
 
 
 public class LinearPrecisionRecallCalculator {
@@ -28,6 +29,8 @@ public class LinearPrecisionRecallCalculator {
 	public static final int thresholdObjectCount   = 429;
 	public static final int thresholdRelationCount = 851;
 	
+	public static final boolean debug = false;
+	
 	private int totalClusters = 0;
 	private int totalElements = 0;
 	
@@ -36,6 +39,7 @@ public class LinearPrecisionRecallCalculator {
 	
 	public HashSet<HashSet<String>> readInClustering(String clusterFilename)
 	{
+		// Hashset doesn't allow duplicates. Do we really want this?
 		HashSet<HashSet<String>> ret = new HashSet<HashSet<String>>();
 		
 		BasicDiskTable clusters = new BasicDiskTable(new File(clusterFilename));
@@ -46,14 +50,19 @@ public class LinearPrecisionRecallCalculator {
 		while(line!=null) {
 			
 			if(line.length>0 && line[0].trim().length()>0) {
-				//System.out.println(join(line, " :: "));
+				//System.out.println(GeneralUtility.join(line, " :: "));
 			
 				totalElements++;
 				
-				cluster.add(line[0]);					
+				// Why do we only add this??
+				//cluster.add(line[0]);	
+				String jline = GeneralUtility.join(line, " ");
+				cluster.add(jline);
+				
 			}
 			else { 
 				if(cluster!=null && cluster.size()>0) {
+					//System.out.println(cluster);
 					ret.add(cluster);
 					totalClusters++;
 				}
@@ -74,6 +83,7 @@ public class LinearPrecisionRecallCalculator {
 	public HashSet<HashSet<String>> readInClustering(
 			String clusterFilename, boolean forObjects) 
 	{
+		
 		int thresholdCount = thresholdObjectCount;
 		if(!forObjects) {
 			thresholdCount = thresholdRelationCount;
@@ -95,6 +105,7 @@ public class LinearPrecisionRecallCalculator {
 				totalElements++;
 				
 				cluster.add(line[0]);
+				
 				if(line.length>2 &&
 				   Integer.parseInt(line[2])>=thresholdCount) 
 				{
@@ -239,6 +250,10 @@ public class LinearPrecisionRecallCalculator {
 	public int [] getPrecisionRecallStats(HashSet<HashSet<String>> h,
 										  HashSet<HashSet<String>> g)
 	{
+		if (debug){
+			System.out.println("Entering getPrecisionRecallStats");
+		}
+		
 		HashSet<String> hclust, gclust, maxG;
 		HashSet<HashSet<String>> usedG = new HashSet<HashSet<String>>(); 
 		HashMap<HashSet<String>, Integer> goldToHypMatchSize = 
@@ -265,11 +280,13 @@ public class LinearPrecisionRecallCalculator {
 		int numGoldClusters = 0;
 		int numHypClusters = 0;
 		
+		// Sort hyp clusters by size (ascending?)
 		LinkedList<HashSet<String>> hypClustersSortedForSize =
 			sortClustersForSize(h);
 		
+		// Loop over hyp clusters, starting with smallest
 		int hClustSize = 0;
-		String firstOne = null;
+		//String firstOne = null;
 		for(Iterator<HashSet<String>> itHypClusters = hypClustersSortedForSize.iterator(); 
 			itHypClusters.hasNext(); ) 
 		{
@@ -277,29 +294,46 @@ public class LinearPrecisionRecallCalculator {
 			maxHScore = 0;
 			maxG = null;
 			
+			
+			if(hclust.size()<2) {
+				continue;
+			}
+			
+			// Loop over each string in hyp cluster. Purpose is to
+			// add each string to allHypElements
+			// Ignore hyp clusters that have only 1 element
+			// Ignore elements that do not show up in the gold elements.
 			hClustSize = 0;
 			for(Iterator<String> itHyp = hclust.iterator(); itHyp.hasNext(); ) {
 				String el = itHyp.next();
 				if(allGoldElements.contains(el)) {
 					hClustSize++;
-					if(hClustSize==1) {
-						firstOne = el;
-					}
-					else if(hClustSize==2) {
-						allHypElements.add(firstOne);
-						allHypElements.add(el);
-					}
-					else {
-						allHypElements.add(el);
-					}
+					allHypElements.add(el);
+
+					
+					// This block is to make sure
+					// that each cluster has at least 2 elements.
+//					if(hClustSize==1) {
+//						firstOne = el;
+//					}
+//					else if(hClustSize==2) {
+//						allHypElements.add(firstOne);
+//						allHypElements.add(el);
+//					}
+//					else {
+//						allHypElements.add(el);
+//					}
+					
 				}
 			}
-			if(hClustSize<2) {
-				continue;
-			}
+
+			
 			totalH += hClustSize;
 			numHypClusters++;
 			
+			// Loop over gold clusters, and find which gold cluster has the 
+			// most intersection with the current hyp cluster
+			// maxG is the cluster with the most intersection
 			for(Iterator<HashSet<String>> itGClusters = g.iterator(); itGClusters.hasNext(); ) {
 				gclust = itGClusters.next();
 				HGScore = 0;
@@ -308,18 +342,23 @@ public class LinearPrecisionRecallCalculator {
 					continue;
 				}
 				
-				for(Iterator itHyp = hclust.iterator(); itHyp.hasNext(); ) {
+				// Loop over strings in current hyp cluster
+				// If they are in this gold cluster, increment HGScore
+				// In short: get intersection size of hclust, and gclust
+				for(Iterator<String> itHyp = hclust.iterator(); itHyp.hasNext(); ) {
 					if(gclust.contains(itHyp.next())) {
 						HGScore++;
 					}
 				}
 				
+				// Get max
 				if(HGScore > maxHScore) {
 					maxHScore = HGScore;
 					maxG = gclust;
 				}
 			}
-						
+			
+			// Associate maxG with size of maxG, using score
 			if(maxG!=null) {
 				usedG.add(maxG);
 				goldToHypMatchSize.put(maxG, new Integer(maxHScore));
@@ -327,12 +366,16 @@ public class LinearPrecisionRecallCalculator {
 			
 			totalCorrectHToG += maxHScore;
 		}
-		
+					
+		// Loop over all gold clusters
 		int clusterSize = 0;
+		int smallClusts = 0;
 		for(Iterator<HashSet<String>> itGoldClusters = g.iterator(); itGoldClusters.hasNext(); ) {
 			gclust = itGoldClusters.next();
 			clusterSize = gclust.size();
 			if(clusterSize<2) {
+				smallClusts++;
+				System.out.println(gclust);
 				continue;
 			}
 			totalG += clusterSize;
@@ -352,6 +395,29 @@ public class LinearPrecisionRecallCalculator {
 				}
 			}
 		}
+		
+		System.out.println("Gold clusters with size<2: " + smallClusts);
+		
+		if (debug){
+			System.out.println("Leaving getPrecisionRecallStats");
+		}
+		
+		double precision = (totalCorrectHToG / ((double)totalH));
+		double recall    = (totalCorrectGToH / ((double)totalG));
+		double F1        = 2 * precision * recall / (precision + recall);
+		
+		//System.out.println("input parameter:    " + param);
+		//System.out.println("merge iteration:    " + mergeIter);
+		System.out.println("num gold clusters:  " + numGoldClusters);
+		System.out.println("num hyp clusters:   " + numHypClusters);
+		System.out.println("num correct hyp:    " + totalCorrectHToG);
+		System.out.println("num hyp elements:   " + totalH);
+		System.out.println("num found gold:     " + totalCorrectGToH);
+		System.out.println("num gold elements:  " + totalG);
+		System.out.println("precision =         " + precision);
+		System.out.println("recall =            " + recall);
+		System.out.println("F1 =                " + F1);
+		
 		
 		// return num correct hyp elements, num hyp elements, num hyp clusters,
 		// num found gold elements, num gold elements, num gold clusters
@@ -378,17 +444,18 @@ public class LinearPrecisionRecallCalculator {
 		double recall    = (stats[3] / ((double)stats[4]));
 		double F1        = 2 * precision * recall / (precision + recall);
 		
-		System.out.println("input parameter:    " + param);
-		System.out.println("merge iteration:    " + mergeIter);
-		System.out.println("num correct hyp:    " + stats[0]);
-		System.out.println("num hyp elements:   " + stats[1]);
-		System.out.println("num found gold:     " + stats[3]);
-		System.out.println("num gold elements:  " + stats[4]);
-		System.out.println("precision =         " + precision);
-		System.out.println("recall =            " + recall);
-		System.out.println("F1 =                " + F1);
-		System.out.println("num hyp clusters:   " + stats[2]);
-		System.out.println("num gold clusters:  " + stats[5]);
+		//System.out.println("input parameter:    " + param);
+		//System.out.println("merge iteration:    " + mergeIter);
+//		System.out.println("num gold clusters:  " + stats[5]);
+//		System.out.println("num hyp clusters:   " + stats[2]);
+//		System.out.println("num correct hyp:    " + stats[0]);
+//		System.out.println("num hyp elements:   " + stats[1]);
+//		System.out.println("num found gold:     " + stats[3]);
+//		System.out.println("num gold elements:  " + stats[4]);
+//		System.out.println("precision =         " + precision);
+//		System.out.println("recall =            " + recall);
+//		System.out.println("F1 =                " + F1);
+
 		
 		out.openForWriting(true);
 		String objRel = "OBJ";
@@ -449,9 +516,11 @@ public class LinearPrecisionRecallCalculator {
 			totalG += itGClusters.next().size();
 		}*/
 		
+		// Sort hyp clusters, ascending?
 		LinkedList<HashSet<String>> hypClustersSortedForSize =
 			sortClustersForSize(h);
 		
+		// Loop through hyp clusters
 		for(Iterator<HashSet<String>> itHypClusters = hypClustersSortedForSize.iterator(); 
 			itHypClusters.hasNext(); ) 
 		{
@@ -460,11 +529,13 @@ public class LinearPrecisionRecallCalculator {
 			maxG = null;
 			matchesGoldCluster = false;
 			
+			// Loop through gold clusters
 			for(Iterator<HashSet<String>> itGClusters = g.iterator(); itGClusters.hasNext(); ) {
 				gclust = itGClusters.next();
 				HGScore = 0;
 				
-				for(Iterator itHyp = hclust.iterator(); itHyp.hasNext(); ) {
+				// For each string in the current hyp cluster...
+				for(Iterator<String> itHyp = hclust.iterator(); itHyp.hasNext(); ) {
 					if(gclust.contains(itHyp.next())) {
 						HGScore++;
 					}
@@ -524,14 +595,14 @@ public class LinearPrecisionRecallCalculator {
 		double recall    = (totalCorrectGToH / ((double)totalG));
 		double F1        = 2 * precision * recall / (precision + recall); 
 		
-		System.out.println("input parameter:    " + param);
-		System.out.println("merge iteration:    " + mergeIter);
+		//System.out.println("input parameter:    " + param);
+		//System.out.println("merge iteration:    " + mergeIter);
 		System.out.println("num gold clusters:  " + numGoldClusters);
 		System.out.println("num hyp clusters:   " + numHypClusters);
-		System.out.println("num gold elements:  " + totalG);
-		System.out.println("num hyp elements:   " + totalH);
 		System.out.println("num correct hyp:    " + totalCorrectHToG);
+		System.out.println("num hyp elements:   " + totalH);
 		System.out.println("num found gold:     " + totalCorrectGToH);
+		System.out.println("num gold elements:  " + totalG);
 		System.out.println("precision =         " + precision);
 		System.out.println("recall =            " + recall);
 		System.out.println("F1 =                " + F1);
@@ -599,6 +670,10 @@ public class LinearPrecisionRecallCalculator {
 			HashSet<HashSet<String>> gold, 
 			String gradedHyp)
 	{
+		if (debug){
+			System.out.println("Entering printMarkedClusters");
+		}
+		
 		BasicDiskTable graded = new BasicDiskTable(new File(gradedHyp));
 		graded.openForWriting();
 		
@@ -617,9 +692,11 @@ public class LinearPrecisionRecallCalculator {
 		
 		int totalHOver2 = 0;
 		
+		// Sort hypothesis clusters by size
 		LinkedList<HashSet<String>> hypClustersSortedForSize =
 			sortClustersForSize(hyp);
 		
+		// Loop through all hyp clusters, starting with smallest
 		int hClustSize = 0;
 		for(Iterator<HashSet<String>> itHypClusters = hypClustersSortedForSize.iterator(); 
 			itHypClusters.hasNext(); ) 
@@ -628,6 +705,7 @@ public class LinearPrecisionRecallCalculator {
 			maxHScore = 0;
 			maxG = null;
 			
+			// Loop through all strings in cluster
 			hClustSize = 0;
 			for(Iterator<String> itHyp = hclust.iterator(); itHyp.hasNext(); ) {
 				String el = itHyp.next();
@@ -649,7 +727,7 @@ public class LinearPrecisionRecallCalculator {
 					continue;
 				}
 				
-				for(Iterator itHyp = hclust.iterator(); itHyp.hasNext(); ) {
+				for(Iterator<String> itHyp = hclust.iterator(); itHyp.hasNext(); ) {
 					if(gclust.contains(itHyp.next())) {
 						HGScore++;
 					}
@@ -672,26 +750,34 @@ public class LinearPrecisionRecallCalculator {
 		
 		graded.flush();
 		graded.closeForWriting();
+		
+		if (debug){
+			System.out.println("Leaving printMarkedClusters");
+		}
 	}
 	
 	public void printResults(String goldFileName, String hypFileName) {
-		LinearPrecisionRecallCalculator prc = new LinearPrecisionRecallCalculator();
+		//LinearPrecisionRecallCalculator prc = new LinearPrecisionRecallCalculator();
 		
 		boolean isObjects = false;
 		
-		String hypClusterFile = goldFileName;
-		String goldClusterFile = hypFileName;
+		//String hypClusterFile = hypFileName;
+		//String goldClusterFile = goldFileName;
 		
 		int totalHypCl, totalHypEl;
-		HashSet<HashSet<String>> hyp  = prc.readInClustering(hypClusterFile);
-		totalHypCl = prc.totalClusters;
-		totalHypEl = prc.totalElements;
+		HashSet<HashSet<String>> hyp  = this.readInClustering(hypFileName);
+		totalHypCl = this.totalClusters;
+		totalHypEl = this.totalElements;
 
 		System.out.println("Total Hypothesis Clusters = " + totalHypCl);
 		System.out.println("Total Hypothesis Elements = " + totalHypEl);
 
-		HashSet<HashSet<String>> gold = prc.readInClustering(goldClusterFile);
+		HashSet<HashSet<String>> gold = this.readInClustering(goldFileName);
+		int totalGoldCl = this.totalClusters - totalHypCl;
+		int totalGoldEl = this.totalElements - totalHypEl;
 
+		System.out.println("Total Gold Clusters = " + totalGoldCl);
+		System.out.println("Total Gold Elements = " + totalGoldEl + "\n");
 		
 		String param = "5"; 
 		
@@ -699,17 +785,19 @@ public class LinearPrecisionRecallCalculator {
 		BasicDiskTable out = new BasicDiskTable(new File("justdeletemeOK.txt"));
 		
 		// Renames hypothesis_clusters.txt as hypothesis_clusters_marked.txt 
-		String markedHypFile = hypClusterFile.substring(0,hypClusterFile.length()-4)+"_marked.txt";
+		String markedHypFile = hypFileName.substring(0,hypFileName.length()-4)+"_marked.txt";
 		
-		int [] precisionRecallStats = prc.getPrecisionRecallStats(hyp, gold);
-		prc.printMarkedClusters(hyp, gold, markedHypFile);
-		prc.writePrecisionRecallStats(
+		int [] precisionRecallStats = this.getPrecisionRecallStats(hyp, gold);
+		this.printMarkedClusters(hyp, gold, markedHypFile);
+		this.writePrecisionRecallStats(
 				precisionRecallStats, 
 				param, 
 				mergeIteration, 
 				out, 
 				isObjects);
-		//prc.calculatePR(hyp, gold, param, mergeIteration, out, isObjects);
+		
+		System.out.println("\nNow calculate pr function...");
+		this.calculatePR(hyp, gold, param, mergeIteration, out, isObjects);
 	}
 	
 	

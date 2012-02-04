@@ -59,7 +59,7 @@ public class SimpleSSM implements Algorithm {
 				int dist = LevenshteinDistance(iString, jString);
 
 				int averageLength = (int) ((iString.length() + jString.length()) / 2.00);
-				if (dist < averageLength/2) {
+				if (dist < 2){ //< averageLength/2) {
 					//c.addStringNoConvert(lines.get(j)[whichElement] + " :::: "
 							//+ lines.get(j)[3]);
 					c.addStringNoConvert(GeneralUtility.join(lines.get(j), " :::: ", 0, lines.get(j).length-1));
@@ -83,7 +83,6 @@ public class SimpleSSM implements Algorithm {
 		clusters.open();
 
 		String[] line = clusters.readLine();
-		System.out.println(line[0]);
 		
 		
 		while (line != null) {

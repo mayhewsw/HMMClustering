@@ -32,6 +32,18 @@ public class GeneralUtility {
 	}
 	
 
+	public static String join(String [] sarr, String sep) {
+		StringBuffer ret = new StringBuffer("");
+		
+		ret.append(sarr[0]);
+		for(int i=0+1; i<=sarr.length-1; i++) {
+			ret.append(sep);
+			ret.append(sarr[i]);
+		}
+		
+		return ret.toString();
+	}
+	
 	public static String join(String [] sarr, String sep, int start, int end) {
 		StringBuffer ret = new StringBuffer("");
 		

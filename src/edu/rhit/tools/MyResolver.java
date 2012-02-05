@@ -18,6 +18,30 @@ public class MyResolver {
 		
 	}
 
+	// This is copied almost exactly out of the paper. pp269.
+	public int ClusterAlgorithm(){
+		// E is all assertions. Array? Arraylist? of String [] ? Only need to iterate. No insert or delete
+		// S is each unique relation or object. Hashset<String>?
+		// Cluster = list of clusters, HashMap?
+		// Elements = list of ?? HashMap?
+		
+		// 1. For each s in S:
+		
+		// 2. Scores is a list, (HashMap?) 
+		//    Index is a list. (HashMap?)
+		
+		// 3. For each extraction in E:
+		// Do various things.
+		
+		// 4. For each property p in Index
+		// Do stuff
+		
+		// 5. Repeat until no merges can be performed.
+		
+		return 0;
+	}
+	
+	
 	/**
 	 * @param args
 	 */

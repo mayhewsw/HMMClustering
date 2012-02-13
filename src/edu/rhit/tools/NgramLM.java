@@ -6,7 +6,7 @@ import java.lang.Integer;
 
 public class NgramLM {
 	private HashMap<Integer, HashMap<String, Integer>> ngramModels;
-	private int maxLength = Integer.MAX_VALUE;
+	private int maxLength = -1;
 
 	public NgramLM() {
 		this.ngramModels = new HashMap<Integer, HashMap<String, Integer>>();
@@ -19,14 +19,18 @@ public class NgramLM {
 	}
 	
 	public void trainString(String s) {
-		int oldMaxLength = this.maxLength;
-		this.maxLength = Math.min(s.length() + 1, this.maxLength);
+		if (this.maxLength > 0) {
+			int oldMaxLength = this.maxLength;
+			this.maxLength = Math.min(s.length() + 1, this.maxLength);
 
-		// if oldMaxLength > maxLength, remove all hashmaps that are too long.
-		if (oldMaxLength > this.maxLength){
-			for(int i= this.maxLength+1; i < oldMaxLength; i++){
-				ngramModels.remove(i);
+			// if oldMaxLength > maxLength, remove all hashmaps that are too long.
+			if (oldMaxLength > this.maxLength){
+				for(int i= this.maxLength+1; i < oldMaxLength; i++){
+					ngramModels.remove(i);
+				}
 			}
+		} else {
+			this.maxLength = s.length() + 1;
 		}
 
 		// Split for all ngram lengths

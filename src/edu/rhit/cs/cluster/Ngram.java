@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import kylm.model.ngram.NgramLM;
-
 import edu.rhit.tools.Cluster;
 import edu.washington.cs.uei.disktable.BasicDiskTable;
 import edu.washington.cs.uei.util.GeneralUtility;
@@ -45,13 +43,14 @@ public class Ngram implements Algorithm {
 			}
 			ignoreUs.add(i);
 			Cluster c = new Cluster();
+			NgramLM model = new NgramLM();
 			
 			c.addStringNoConvert(GeneralUtility.join(lines.get(i), " :::: ", 0, lines.get(i).length-1));
 
 			// Create the ngram model for the i string
 			String istring = GeneralUtility.join(lines.get(i), " ", 0, 2);
 			// Start with higher N in ngrams
-			
+			model.trainString(istring);
 			
 			
 			for (int j = i + 1; j < lines.size(); j++) {

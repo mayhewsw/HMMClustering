@@ -2,10 +2,11 @@ package edu.rhit.tools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.lang.Integer;
 
 public class NgramLM {
 	private HashMap<Integer, HashMap<String, Integer>> ngramModels;
-	private int maxLength = 0;
+	private int maxLength = Integer.MAX_VALUE;
 
 	public NgramLM() {
 		this.ngramModels = new HashMap<Integer, HashMap<String, Integer>>();

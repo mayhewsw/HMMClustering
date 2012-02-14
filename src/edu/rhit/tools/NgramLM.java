@@ -80,6 +80,49 @@ public class NgramLM {
 		return 0;
 	}
 
+	// In this case, we do not consider word-based ngrams, but character-based.
+	// That is, "abc" is a trigram.
+	public float KatzBackoff(String s){
+		int lens = s.length();
+		
+		// This is an error
+		if (lens > this.maxLength){
+			System.out.println("Whoops, input string is too long for the model.");
+			return -1;
+		}
+		
+		// Base case
+		if(lens == 1){
+			return ngramModels.get(1).get(s);
+		}
+		
+		HashMap<String, Integer> contextModel = ngramModels.get(lens-1);
+		HashMap<String, Integer> stringModel = ngramModels.get(lens);
+		String context = s.substring(0, lens-1);
+		
+		// If the context exists...
+		// TODO: make this discounted somehow.
+		if (contextModel.containsKey(context)){
+			float contextCounts = contextModel.get(context);
+			
+			float stringCounts;
+			if (stringModel.containsKey(s)){
+				stringCounts = stringModel.get(s);
+			}else{
+				stringCounts = 0;
+			}
+			
+			return stringCounts / contextCounts;
+			
+		}
+		
+		// else, there is no context....
+		float alpha = 1; //getAlpha(context)
+		return alpha * KatzBackoff(s.substring(1, lens));
+		
+	}
+	
+	
 	public float getSentProbWithN(String s, int n){
 		String[] splitString = this.splitString(s, n);
 		
@@ -132,7 +175,9 @@ public class NgramLM {
 		//System.out.println("\n\nRetrain");
 		//model.trainModel(s1);
 		
-		model.getSentProbWithN("baabbabaccbca", 2);
+		//model.getSentProbWithN("baabbabaccbca", 2);
+		float prob = model.KatzBackoff("bacbccba");
+		System.out.println(prob);
 
 	}
 }

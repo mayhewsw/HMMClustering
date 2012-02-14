@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import edu.rhit.tools.Cluster;
+import edu.rhit.tools.NgramLM;
 import edu.washington.cs.uei.disktable.BasicDiskTable;
 import edu.washington.cs.uei.util.GeneralUtility;
 
@@ -204,40 +205,19 @@ public class Ngram implements Algorithm {
 
 
 	public static void main(String[] args) {
-		//Ngram s = new Ngram();
-		//s.getData(infile);
-		//HashSet<Cluster> clusters = s.divideToClusters(0);
-//		s.produceOutput(clusters, outfile);
-//		System.out.println("Done");
+		Ngram s = new Ngram();
+		s.getData(infile);
+		HashSet<Cluster> clusters = s.divideToClusters(0);
+		s.produceOutput(clusters, outfile);
+		System.out.println("Done");
 		
-		ArrayList<String []> a = new ArrayList<String []>();
-		String [] s1 = {"ab", "e ", "li", "nc", "ol", "n ", "be", " b", "ea", "r ", "on", " f", "eb", "ru", "ar", "y ", "12", ", ", "18", "09"};
-		String [] s2 = {"ab", "e ", "li", "nc", "ol" ,"n ", "be", " b", "ea", "r ", "in", " 18", "09"};
-		String [] s3 = {"GE", "ZZ"};
-		a.add(s1);
-		a.add(s2);
-		a.add(s3);
-		
-		
-		int n = 5;
-		NgramLM lm = new NgramLM(n);
-		try {
-			lm.trainModel(a);
-
-			lm.countNgrams(a);
-
-			System.out.println(lm.printReport());
-			
-			
-			for (int i : lm.getNgramCounts()){
-				System.out.println(i);
-			}
-				
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		
+//		ArrayList<String []> a = new ArrayList<String []>();
+//		String [] s1 = {"ab", "e ", "li", "nc", "ol", "n ", "be", " b", "ea", "r ", "on", " f", "eb", "ru", "ar", "y ", "12", ", ", "18", "09"};
+//		String [] s2 = {"ab", "e ", "li", "nc", "ol" ,"n ", "be", " b", "ea", "r ", "in", " 18", "09"};
+//		String [] s3 = {"GE", "ZZ"};
+//		a.add(s1);
+//		a.add(s2);
+//		a.add(s3);
 
 	}
 

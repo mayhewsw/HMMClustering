@@ -69,17 +69,50 @@ public class NgramLM {
 
 		HashMap<String, Integer> currModel = ngramModels.get(splitLen);
 
-		// Check to see 
-
-
-		// check to see if all splits are in the model
-		// if so, get counts and probability. Done.
-		// otherwise, backoff, discounting
+		// Check to see if all elements of splitString are in the model
+		
+		
+		// If so, get counts and probability. Done.
+		
+		// Otherwise, backoff, discounting
 		// get counts and probability
 		// Done.
 		return 0;
 	}
 
+	public float getSentProbWithN(String s, int n){
+		String[] splitString = this.splitString(s, n);
+		
+		HashMap<String, Integer> currModel = ngramModels.get(n);
+		
+		ArrayList<String> backoffList = new ArrayList<String>();
+		
+		// Find those strings that are not in currModel, and back off/discount
+		for (String hyp : splitString){
+			if( !currModel.containsKey(hyp)){
+				// this one will be backed off
+				backoffList.add(hyp);
+			}
+		}
+		
+		for (String h : backoffList){
+			// if h is the only string with that prefix to be missing stuff, add it back by stealing from the others.
+			
+			// if there are other strings in backofflist that have the same prefix as h, 
+			// then steal from strings with prefix, and back off again to get relative probabilities.
+						
+		}
+		
+//		for (String t : splitString){
+//			System.out.println(t);
+//		}
+//		
+//		System.out.println(currModel);
+		
+		
+		return 0;
+	}
+	
 	private String[] splitString(String s, int n) { 
 		ArrayList<String> segments = new ArrayList<String>();
 		for (int i = 0; i < s.length() - n + 1; i++) {
@@ -91,12 +124,15 @@ public class NgramLM {
 	public static void main(String[] argv) {
 		NgramLM model = new NgramLM();
 		ArrayList<String> s1 = new ArrayList<String>(); 
-		s1.add("abe lincoln"); s1.add("abraham lincoln");
+		s1.add("bacbccbcca"); //s1.add("abraham lincoln");
 		model.trainModel(s1);
 
-		s1.add("lincoln");
-		System.out.println("\n\nRetrain\n\n");
-		model.trainModel(s1);
+		//s1.clear();
+		//s1.add("baabbabaccbca");
+		//System.out.println("\n\nRetrain");
+		//model.trainModel(s1);
+		
+		model.getSentProbWithN("baabbabaccbca", 2);
 
 	}
 }

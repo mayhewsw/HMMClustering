@@ -2,6 +2,7 @@ package edu.washington.cs.uei.scoring;
 
 public class Pair {
 		public String [] s1, s2;
+
 		
 		public Pair(String [] str1, String [] str2)
 		{

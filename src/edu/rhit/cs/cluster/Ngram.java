@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import edu.rhit.tools.Cluster;
+import edu.rhit.tools.NgramLM;
 import edu.washington.cs.uei.disktable.BasicDiskTable;
 import edu.washington.cs.uei.util.GeneralUtility;
 
@@ -22,7 +23,6 @@ public class Ngram implements Algorithm {
 	
 	
 	ArrayList<String[]> lines;
-	private final int threshold = 8; // ??
 
 	public Ngram() {
 		this.lines = new ArrayList<String[]>();
@@ -44,13 +44,14 @@ public class Ngram implements Algorithm {
 			}
 			ignoreUs.add(i);
 			Cluster c = new Cluster();
+			NgramLM model = new NgramLM();
 			
 			c.addStringNoConvert(GeneralUtility.join(lines.get(i), " :::: ", 0, lines.get(i).length-1));
 
 			// Create the ngram model for the i string
 			String istring = GeneralUtility.join(lines.get(i), " ", 0, 2);
 			// Start with higher N in ngrams
-			
+			model.trainString(istring);
 			
 			
 			for (int j = i + 1; j < lines.size(); j++) {
@@ -61,7 +62,8 @@ public class Ngram implements Algorithm {
 				// compare j against the ngram model for i
 				String jstring = GeneralUtility.join(lines.get(j), " ", 0, 2);
 				
-				// If j is withing the correct boundary??? cluster it.
+				// If j is within the correct boundary??? cluster it.
+				
 				
 				// If j is clustered.
 				ignoreUs.add(j);
@@ -206,9 +208,16 @@ public class Ngram implements Algorithm {
 		Ngram s = new Ngram();
 		s.getData(infile);
 		HashSet<Cluster> clusters = s.divideToClusters(0);
-//		s.produceOutput(clusters, outfile);
-//		System.out.println("Done");
-//		
+		s.produceOutput(clusters, outfile);
+		System.out.println("Done");
+		
+//		ArrayList<String []> a = new ArrayList<String []>();
+//		String [] s1 = {"ab", "e ", "li", "nc", "ol", "n ", "be", " b", "ea", "r ", "on", " f", "eb", "ru", "ar", "y ", "12", ", ", "18", "09"};
+//		String [] s2 = {"ab", "e ", "li", "nc", "ol" ,"n ", "be", " b", "ea", "r ", "in", " 18", "09"};
+//		String [] s3 = {"GE", "ZZ"};
+//		a.add(s1);
+//		a.add(s2);
+//		a.add(s3);
 
 	}
 

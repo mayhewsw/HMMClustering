@@ -184,7 +184,7 @@ public class SimpleSSM implements Algorithm {
 	// Taken from: http://www.merriampark.com/ld.htm
 	// ****************************
 
-	private int Minimum(int a, int b, int c) {
+	private static int Minimum(int a, int b, int c) {
 		int mi;
 
 		mi = a;
@@ -203,7 +203,7 @@ public class SimpleSSM implements Algorithm {
 	// Taken from: http://www.merriampark.com/ld.htm
 	// *****************************
 
-	public int LevenshteinDistance(String s, String t) {
+	public static int LevenshteinDistance(String s, String t) {
 		int d[][]; // matrix
 		int n; // length of s
 		int m; // length of t
@@ -284,7 +284,7 @@ public class SimpleSSM implements Algorithm {
 //		s.produceOutput(clusters, outfile);
 //		System.out.println("Done");
 //		
-		System.out.println(s.LevenshteinDistance("Microsoft Windows", "Alcoholic Beverages"));
+		System.out.println(LevenshteinDistance("Microsoft Windows", "Alcoholic Beverages"));
 
 	}
 

@@ -1,16 +1,16 @@
 # Import the corpus and functions used from nltk library
-from nltk.corpus import reuters
-from nltk.corpus import genesis
-from nltk.probability import LidstoneProbDist
-from nltk.model import NgramModel
-from nltk.util import ingrams
+#from nltk.corpus import reuters
+#from nltk.corpus import genesis
+#from nltk.probability import LidstoneProbDist
+#from nltk.model import NgramModel
+#from nltk.util import ingrams
 
 # Tokens contains the words for Genesis and Reuters Trade
-genesis_tokens = list(genesis.words('english-kjv.txt'))
+#genesis_tokens = list(genesis.words('english-kjv.txt'))
 #tokens.extend(list(reuters.words(categories = 'trade')))
 
 # estimator for smoothing the N-gram model
-estimator = lambda fdist, bins: LidstoneProbDist(fdist, 0.2)
+#estimator = lambda fdist, bins: LidstoneProbDist(fdist, 5)
 
 #sent = "abraham lincoln be bear feb 12 1809"
 #tokens = sent.split()
@@ -44,46 +44,55 @@ estimator = lambda fdist, bins: LidstoneProbDist(fdist, 0.2)
 #print text
 
 
+import ngram
 
 infilename = "randomized_clusters6.txt"
-outfilename = "converted_clusters6.txt"
+outfilename = "PyNGram_clustered_clusters6.txt"
 infile = open(infilename, "r")
 outfile = open(outfilename, "w")
 
 inlines = infile.readlines()
 
-tokenlength = 1
 
-for i, iString in enumerate(inlines):
-    iString = " ".join(iString.split(" :::: ")[:3])
-    splitistring = list(ingrams(list(iString), tokenlength))
+clusters = []
+ignoreus = []
 
-    itokens = ["".join(x) for x in splitistring]
-    #itokens.extend(genesis_tokens)
+threshold = 0.4
+
+for i, iline in enumerate(inlines):
+    iString = " ".join(iline.split(" :::: ")[:3])
     
-    model = NgramModel(tokenlength, itokens) #, estimator)
-    
+    print iString
+
+    if i in ignoreus:
+        continue
+
+    ignoreus.append(i)
+
+    icluster = {}
+    icluster[iline] = -1
     
     for j in range(i, len(inlines)):
-        jString = " ".join(inlines[j].split(" :::: ")[:3])
-        splitjstring = list(ingrams(list(jString), tokenlength))
-        jtokens = ["".join(x) for x in splitjstring]
 
-        #        if iString == jString:
-        #            print "\n HELLO \n"
-
-        # Compare iString and jString
-        score = model.prob(jtokens[-1], [jString])
-
-        if score > 0.4:
-            print iString
-            print jString
-            print score
+        if j in ignoreus:
+            continue
         
 
+        jline = inlines[j]
+        jString = " ".join(jline.split(" :::: ")[:3])
+        score = ngram.NGram.compare(jString, iString, N=2)
+        
+        if score > threshold:
+            icluster[jline] = score
+            ignoreus.append(j)
+
+    clusters.append(icluster)
 
 
-
-
+# Write output
+for c in clusters:
+    outfile.write("".join([x for x,y in sorted(c.items(), key=lambda x: x[1])]))
+    outfile.write("\n")
+    
 infile.close()
 outfile.close()

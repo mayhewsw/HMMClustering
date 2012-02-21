@@ -1,6 +1,10 @@
 import random
 
 filename = "clusters6.txt"
+#whichToWrite = "obj1" #other options are: "rel", "obj2"
+#whichToWrite = "rel" #other options are: "rel", "obj2"
+whichToWrite = "obj2" #other options are: "rel", "obj2"
+
 
 def randomize():
 	''' This takes a gold standard file
@@ -24,7 +28,8 @@ def randomize():
 			continue
 		sl = l.split("\t")
 		# We want ...
-		outs = sl[4] + " :::: " + sl[5] + " :::: " + sl[6] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"
+		#outs = sl[4] + " :::: " + sl[5] + " :::: " + sl[6] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"
+		outs = writeLine(sl)
 		randInsertion = random.randint(0, len(outlist))
 		outlist.insert(randInsertion, outs)
 	
@@ -51,7 +56,8 @@ def convertType():
 			continue
 		sl = l.split("\t")
 		# We want ...
-		outs = sl[4] + " :::: " + sl[5] + " :::: " + sl[6] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"
+		#outs = sl[4] + " :::: " + sl[5] + " :::: " + sl[6] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"
+		outs = writeLine(sl)
 		outlist.append(outs)
 	
 	for s in outlist:
@@ -59,6 +65,18 @@ def convertType():
 
 	f.close()
 	out.close()
+
+def writeLine(sl):
+	if whichToWrite == "obj1":
+		return sl[4] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"	
+	elif whichToWrite == "rel":
+		return sl[5] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"	
+	elif whichToWrite == "obj2":
+		return sl[6] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"
+	else:
+		return sl[4] + " :::: " + sl[5] + " :::: " + sl[6] + " :::: " + sl[0] + " :::: 0 :::: 0 :::: R :::: P\n"	
+
+
 
 if __name__ == "__main__":
 	randomize()

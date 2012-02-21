@@ -8,3 +8,5 @@ justdeleteme*
 *.pdf
 *.log
 *.synctex.gz
+*.vrb
+*.lst

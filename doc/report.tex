@@ -13,6 +13,7 @@
 \setlength{\topskip}{0mm} \setlength{\textheight}{235.2mm}
 \setlength{\footskip}{12.4mm} \setlength{\parindent}{1pc}
 
+\usepackage{minted}
 
 \ICMEfinalcopy % *** Uncomment this line for the final submission
 
@@ -66,7 +67,21 @@ Rose-Hulman Institute of Technology}
 \section{Introduction}
 \label{sec:intro}
 
+Our idea was to use Hidden Markov Models (HMM) to cluster relations.
+Relations come from ReVerb from University of Washington. 
+Problem can be summarized with:
 
+Given relations, of the form (object, relation, object), understand which extractions have the same meaning. For example, the following extractions would all be clustered together
+
+\fvset{frame=single}
+\begin{minted}[fontsize=\footnotesize]{text}
+(tony blair, is prime minister of, britain) 
+(tony blair, is prime minister of, great britain) 
+(tony blair, is the prime minister of, the UK)
+\end{minted}
+\fvset{frame=none}
+
+We note that facts do not need to be true to be part of the system.
 
 
 

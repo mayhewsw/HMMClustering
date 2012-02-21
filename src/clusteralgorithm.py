@@ -1,5 +1,11 @@
 import ngram
 
+__DEBUG__ = True
+
+def debug_print(msg, *args):
+	if __DEBUG__:
+		print msg % (args)
+
 def build_clusters(inlines, threshold=0.4, N=2):
 	clusters = []
 	ignoreus = []
@@ -7,7 +13,7 @@ def build_clusters(inlines, threshold=0.4, N=2):
 	for i, iline in enumerate(inlines):
 		iString = " ".join(iline.split(" :::: ")[:3])
 
-		print iString
+		debug_print("Built cluster for string %s", iString)
 
 		if i in ignoreus:
 			continue
@@ -18,7 +24,6 @@ def build_clusters(inlines, threshold=0.4, N=2):
 		icluster[iline] = -1
 
 		for j in range(i, len(inlines)):
-
 			if j in ignoreus:
 				continue
 
@@ -27,6 +32,7 @@ def build_clusters(inlines, threshold=0.4, N=2):
 			jString = " ".join(jline.split(" :::: ")[:3])
 			score = ngram.NGram.compare(jString, iString, N=N)
 
+			debug_print("Testing string %s...score %s", jString, score)
 			if score > threshold:
 				icluster[jline] = score
 				ignoreus.append(j)

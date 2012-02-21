@@ -4,3 +4,7 @@ bin
 .settings
 *~
 justdeleteme*
+*.aux
+*.pdf
+*.log
+*.synctex.gz

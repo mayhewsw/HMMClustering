@@ -10,3 +10,6 @@ justdeleteme*
 *.synctex.gz
 *.vrb
 *.lst
+src/converted_clusters6.txt
+src/randomized_clusters6.txt
+doc/report.pyg.sty

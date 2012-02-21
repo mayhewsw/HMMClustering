@@ -76,8 +76,7 @@ for i, iline in enumerate(inlines):
 
         if j in ignoreus:
             continue
-        
-
+    
         jline = inlines[j]
         jString = " ".join(jline.split(" :::: ")[:3])
         score = ngram.NGram.compare(jString, iString, N=2)

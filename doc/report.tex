@@ -1,0 +1,98 @@
+% Template for ICME-2010 paper; to be used with:
+%          spconf.sty  - ICASSP/ICIP LaTeX style file, and
+%          IEEEbib.bst - IEEE bibliography style file.
+% --------------------------------------------------------------------------
+\documentclass{article}
+\usepackage{spconf_ICME,amsmath,epsfig,fancyhdr}
+\setlength{\paperwidth}{215.9mm} \setlength{\hoffset}{-9.7mm}
+\setlength{\oddsidemargin}{0mm} \setlength{\textwidth}{184.3mm}
+\setlength{\columnsep}{6.3mm} \setlength{\marginparsep}{0mm}
+\setlength{\marginparwidth}{0mm} \setlength{\paperheight}{279.4mm}
+\setlength{\voffset}{-7.4mm} \setlength{\topmargin}{0mm}
+\setlength{\headheight}{0mm} \setlength{\headsep}{0mm}
+\setlength{\topskip}{0mm} \setlength{\textheight}{235.2mm}
+\setlength{\footskip}{12.4mm} \setlength{\parindent}{1pc}
+
+
+\ICMEfinalcopy % *** Uncomment this line for the final submission
+
+\def\ICMEPaperID{****} % *** Enter the ICME Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ifICMEfinal\pagestyle{empty}\fi
+
+
+\begin{document}\sloppy
+
+% Example definitions.
+% --------------------
+\def\x{{\mathbf x}}
+\def\L{{\cal L}}
+
+
+% Title.
+% ------
+\title{Using N-gram similarity metrics for Relation Clustering}
+%
+% Single address.
+% ---------------
+\name{Stephen Mayhew, Nicholas Kamper}
+
+\address{
+\textit{mayhewsw@rose-hulman.edu}\\
+\textit{kampernj@rose-hulman.edu}\\
+Rose-Hulman Institute of Technology}
+
+
+\maketitle
+% insert page header and footer here for IEEE PDF Compliant
+\thispagestyle{fancy} \fancyhead{} \lhead{}
+\lfoot{\copyright2012 SWM, NJK} \cfoot{}
+%\rfoot{ICME 2010}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+
+%
+%\begin{abstract}
+%This paper has to do with relation extraction. This is probably best written %after the rest of the paper is done.
+%\end{abstract}
+%
+%\begin{keywords}
+%Natural Language Processing, Information Extraction, Relation Extraction, %Coreference Resolution
+%\end{keywords}
+%
+\section{Introduction}
+\label{sec:intro}
+
+
+
+
+
+\section{Experiments}
+
+Use HMM for the actual clustering. Dead wall.
+
+HMM for scoring (Multiple sequence alignment). Dead wall.
+
+Decided to ditch HMM altogether.
+
+How about using N-grams? (Considered using Google data)
+Started writing our own code in Java (because of legacy code)
+
+Going slowly, tried several libraries: NLTK, OpenNLP, KYLM, and some other small open source projects.
+
+Finally, we chanced on Python ngram similarity library that uses ngrams to predict similarity between two strings. 
+
+``The NGram class is a set that supports searching for its members by N-Gram string similarity." \cite{py_ngram_lib}
+
+
+\begin{thebibliography}{1}
+
+\bibitem{py_ngram_lib}
+Michel Albert, Graham Poulter, and open source contributors. Python NGram Similarity Library. \textit{http://packages.python.org/ngram/}
+\end{thebibliography}
+
+
+\end{document}

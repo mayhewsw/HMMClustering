@@ -81,8 +81,8 @@ We note that facts do not need to be true to be part of the system.
 
 
 
-\section{Experiments}
-We began by looking into ways that HMM's could be used to solve the problem. Our thought process went: we will need to compare every sentence against every other to check similarity. We can train an HMM on a given sentence, and then test every other sentence on that HMM. The resulting score would be compared to some threshold in order to decide if those two strings should be clustered. 
+\section{Project Background}
+We began by looking into ways that HMMs could be used to solve the problem. Our thought process went: we will need to compare every sentence against every other to check similarity. We can train an HMM on a given sentence, and then test every other sentence on that HMM. The resulting score would be compared to some threshold in order to decide if those two strings should be clustered. 
 
 This approach had many problems. First of all, that is a fragile model (how to deal with skips etc.). Second, one sentence does not train very well. 
 
@@ -92,7 +92,7 @@ Another line of thought was, perhaps the hidden states are meanings, and the tex
 HMM for scoring (Multiple sequence alignment). Dead wall.
 Next we researched using a technique called Multiple Sequence Alignment, which is used in biological research to classify protein sequences. This seemed promising to begin with, but we realized that the domain of the protein alphabet is much smaller (4 symbols), and this caused problems for us. 
 
-Having failed these two applications, we were at a loss. It seemed that HMM's may not be the best tool for the job.
+Having failed these two applications, we were at a loss. It seemed that HMMs may not be the best tool for the job.
 
 Our next exploration focused on n-gram models. It seemed reasonable to use n-gram models in a similar way as described for HMM's above: when comparing every pair of strings, we create an n-gram model using the first string, and test it with the second one. Unsurprisingly, this failed for many of the same reasons. The scores it returned were largely erratic and useless. That is, it would classify strings as ``microsoft windows'' as being more likely to match ``barack obama'' than ``president obama'' would be. We were using NLTK, which in turn used n-gram models with Katz backoff, and Lidstone smoothing \cite{nltk}. 
 
@@ -102,14 +102,139 @@ Before we landed on using NLTK, we tried several different libraries, including 
 
 Finally, we chanced on Python n-gram similarity library that uses n-grams to predict similarity between two strings. This library is given the imaginative name of ``NGram". The documentation describes it as follows: ``The NGram class is a set that supports searching for its members by N-Gram string similarity." \cite{py_ngram_lib}
 
-What is n-gram string similarity?
 
-How did we use it?
+
+
 
 What kind of results did we get?
 
 What are we going to try to get better results?
 
+
+\section{N-Gram Similarity Model, Our Clustering}
+We examined the Python NGram string similarity library to understand how it works. It is a single file, and it took less than half an hour to read it through. We summarize the algorithm in Figure \ref{algorithm}.
+
+Our clustering algorithm is a very simple $\mathcal{O}(n^2)$ algorithm, outlined in Figure \ref{clustering}.
+
+\begin{figure}
+\fvset{frame=single}
+\begin{minted}[mathescape,fontsize=\footnotesize,tabsize=4]{python}
+def compare(string: s1, string: s2, int: N):
+	s1_padded = pad s1 on either side using
+				   N-1 padding characters.
+	s1_ngrams = split s1_padded into n-grams 
+				   of length N
+	
+	s2_padded = pad s2 on either side using
+				   N-1 padding characters.
+	s2_ngrams = split s2_padded into n-grams 
+				   of length N	
+	
+	samegrams = number of n-grams in intersection
+				 of s1_ngrams & s2_ngrams
+	
+	allgrams = len(s1_ngrams) + len(s2_ngrams)
+			  	  - samegrams
+	
+	return samegrams / allgrams
+\end{minted}
+\fvset{frame=none}
+\vspace{-20pt}
+\caption{N-gram Similarity Algorithm}
+\label{algorithm}
+\end{figure}
+
+\begin{figure}
+\fvset{frame=single}
+\begin{minted}[mathescape,fontsize=\footnotesize,tabsize=4]{python}
+def cluster(string []: extractions as e):
+	threshold = some value
+	N = some value
+
+	for i in range(len(e)):
+		for j in range(i+1, len(e)):
+			score = compare(e[i], e[j], N)
+			
+			if score > threshold:
+				cluster e[i] and e[j]
+\end{minted}
+\fvset{frame=none}
+\vspace{-20pt}
+\caption{Our Clustering Algorithm}
+\label{clustering}
+\end{figure}
+
+
+\section{Experiments}
+For each experiment, we wrote a script that could run the clusterer multiple times but with different parameters. The two parameters we changed were N, the length of the n-grams, and the threshold, as used in Figure \ref{clustering}.
+
+
+
+
+Baseline - easy.
+
+Backoff - between two different strings, if no ngrams matched, then try again 
+with N being one less.
+
+The idea being that we would not accept 0 as an answer. 0 is not a very useful answer.
+
+Cumulative data - as follows:
+N = high number
+score = 0
+while N > 1:
+	score += compare with N
+ 	N = N-1 
+
+The idea being that strings with several long n-grams in common should be given credit. 
+
+
+Extending the model: we match strings by every string in the cluster so far. 
+The problem with this approach was that as soon as a wrong string was added to a cluster, it opened the door for a large number of other bad strings. With various experiments with the threshold, we found that it had a way of either putting all strings in one big cluster, or separating each string into it's own one-element cluster. 
+
+How about a variable threshold for extending the model? This could also work. The idea would be to have a very strict threshold at first, so only similar strings would be added. But as more strings are added, raise the threshold so that it is not so stringent any more. How does this work?
+
+
+
+
+
+\section{Results}
+The F1 measure is a combination of precision and recall. The F1 measure is a percentage. 
+
+About 70\% F1 measure in the best cases.
+
+We found that the baseline results (see Figure \ref{baseline}) were as good or better than any of the experiments we tried.
+
+The results for backoff (see Figure \ref{backoff}) were slightly worse, but more consistently better.
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.17]{baselinescores.png}
+\end{center}
+\caption{Baseline Results}
+\label{baseline}
+\end{figure}
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.17]{backoff.png}
+\end{center}
+\caption{Backoff Results}
+\label{backoff}
+\end{figure}
+
+
+\section{Future Work}
+look into techniques outlined in \cite{ngram_sim}
+
+
+
+
+
+
+
+
+Possibility: backing off. (just reduce N)
 
 \begin{thebibliography}{1}
 
@@ -117,10 +242,13 @@ What are we going to try to get better results?
 Michel Albert, Graham Poulter, and open source contributors. Python NGram Similarity Library. \textit{http://packages.python.org/ngram/}
 
 \bibitem{yates2009}
-Alexander Yates, Oren Etzioni. \textit{Unsupervised Methods for Determining Object and Relation Synonyms on the Web}. Journal of Artificial Intelligence Research (JAIR). March, 2009.
+Alexander Yates, Oren Etzioni (March, 2009). \textit{Unsupervised Methods for Determining Object and Relation Synonyms on the Web}. Journal of Artificial Intelligence Research (JAIR). 
 
 \bibitem{nltk}
 Bird, Steven, Edward Loper and Ewan Klein (2009). \textit{Natural Language Processing with Python}.  O'Reilly Media Inc.
+
+\bibitem{ngram_sim}
+Kondrak, Grzegorz (2005). \textit{N-gram similarity and distance}. In Proceedings of the 12th International Conference on String Processing and Information Retrieval (Buenos Aires, Argentina). 115–126.
 
 \end{thebibliography}
 

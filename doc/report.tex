@@ -130,11 +130,11 @@ def compare(string: s1, string: s2, int: N):
 	s2_ngrams = split s2_padded into n-grams 
 				   of length N	
 	
-	samegrams = intersection of s1_ngrams
-			 	   & s2_ngrams
+	samegrams = number of n-grams in intersection
+				 of s1_ngrams & s2_ngrams
 	
 	allgrams = len(s1_ngrams) + len(s2_ngrams)
-			  	  - len(samegrams)
+			  	  - samegrams
 	
 	return samegrams / allgrams
 \end{minted}

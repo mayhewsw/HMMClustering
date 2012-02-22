@@ -67,11 +67,7 @@ Rose-Hulman Institute of Technology}
 \section{Introduction}
 \label{sec:intro}
 
-Our idea was to use Hidden Markov Models (HMM) to cluster relations.
-Relations come from ReVerb from University of Washington. 
-Problem can be summarized with:
-
-Given relations, of the form (object, relation, object), understand which extractions have the same meaning. For example, the following extractions would all be clustered together
+The overall goal of our project was to use Hidden Markov Models (HMM) to cluster relations. A relation is a triple of the form (object, relation, object), such as \textit{(george washington, was president of, the usa)}. Such relations are the output of relation extractors. These relation extractors process a massive amount of web text, and inevitably produce many different strings that refer to the same thing. The goal of this system is to cluster these extractions by their meaning. For example, one such cluster might be:
 
 \fvset{frame=single}
 \begin{minted}[fontsize=\footnotesize]{text}
@@ -86,27 +82,46 @@ We note that facts do not need to be true to be part of the system.
 
 
 \section{Experiments}
+We began by looking into ways that HMM's could be used to solve the problem. Our thought process went: we will need to compare every sentence against every other to check similarity. We can train an HMM on a given sentence, and then test every other sentence on that HMM. The resulting score would be compared to some threshold in order to decide if those two strings should be clustered. 
 
-Use HMM for the actual clustering. Dead wall.
+This approach had many problems. First of all, that is a fragile model (how to deal with skips etc.). Second, one sentence does not train very well. 
+
+Another line of thought was, perhaps the hidden states are meanings, and the text is an output. This was a good thought, but there is no limit on the number of meanings, and no limit on the number of outputs. 
+
 
 HMM for scoring (Multiple sequence alignment). Dead wall.
+Next we researched using a technique called Multiple Sequence Alignment, which is used in biological research to classify protein sequences. This seemed promising to begin with, but we realized that the domain of the protein alphabet is much smaller (4 symbols), and this caused problems for us. 
 
-Decided to ditch HMM altogether.
+Having failed these two applications, we were at a loss. It seemed that HMM's may not be the best tool for the job.
 
-How about using N-grams? (Considered using Google data)
-Started writing our own code in Java (because of legacy code)
+Our next exploration focused on n-gram models. It seemed reasonable to use n-gram models in a similar way as described for HMM's above: when comparing every pair of strings, we create an n-gram model using the first string, and test it with the second one. Unsurprisingly, this failed for many of the same reasons. The scores it returned were largely erratic and useless. That is, it would classify strings as ``microsoft windows'' as being more likely to match ``barack obama'' than ``president obama'' would be. We were using NLTK, which in turn used n-gram models with Katz backoff, and Lidstone smoothing \cite{nltk}. 
 
-Going slowly, tried several libraries: NLTK, OpenNLP, KYLM, and some other small open source projects.
+Since we also had 87-GB of Google n-gram data at hand, we considered how we could use it. However, we could not find any good way to use it.
 
-Finally, we chanced on Python ngram similarity library that uses ngrams to predict similarity between two strings. 
+Before we landed on using NLTK, we tried several different libraries, including OpenNLP, KYLM. These, however, were either only partially implemented, or only partially documented. We found them to be of little help.
 
-``The NGram class is a set that supports searching for its members by N-Gram string similarity." \cite{py_ngram_lib}
+Finally, we chanced on Python n-gram similarity library that uses n-grams to predict similarity between two strings. This library is given the imaginative name of ``NGram". The documentation describes it as follows: ``The NGram class is a set that supports searching for its members by N-Gram string similarity." \cite{py_ngram_lib}
+
+What is n-gram string similarity?
+
+How did we use it?
+
+What kind of results did we get?
+
+What are we going to try to get better results?
 
 
 \begin{thebibliography}{1}
 
 \bibitem{py_ngram_lib}
 Michel Albert, Graham Poulter, and open source contributors. Python NGram Similarity Library. \textit{http://packages.python.org/ngram/}
+
+\bibitem{yates2009}
+Alexander Yates, Oren Etzioni. \textit{Unsupervised Methods for Determining Object and Relation Synonyms on the Web}. Journal of Artificial Intelligence Research (JAIR). March, 2009.
+
+\bibitem{nltk}
+Bird, Steven, Edward Loper and Ewan Klein (2009). \textit{Natural Language Processing with Python}.  O'Reilly Media Inc.
+
 \end{thebibliography}
 
 
